@@ -1,16 +1,10 @@
-
-import { IOrder, IOrderList } from "./types";
-
-// Inicia el flujo 
-export class ShippingOffice {
-  // Crea un pedido en la lista 
+class ShippingOffice {
   prepareRequisition(list: IOrderList, product: string, qty: number): IOrder {
     return list.add(product, qty);
   }
 }
 
-// Gestiona RFQ y revisa cotizaciones
-export class BuyerAgent {
+class BuyerAgent {
   prepareQuoteRequest(order: IOrder, needsReview: boolean): void {
     order.needsReview = needsReview;
     order.status      = needsReview ? "needs_supervisor" : "review_quotation";
@@ -18,7 +12,6 @@ export class BuyerAgent {
     order.log.push(`🧑 Buyer Agent: RFQ enviado. ¿Necesita revisión? ${needsReview ? "Sí " + path : "No " + path}`);
   }
 
-  // Revisa la cotización enviada por el Seller
   reviewQuote(order: IOrder, acceptable: boolean): void {
     order.status = acceptable ? "order_preparation" : "analyze_quote";
     order.log.push(
@@ -29,8 +22,7 @@ export class BuyerAgent {
   }
 }
 
-// Evalúa y aprueba o rechaza la solicitud
-export class Supervisor {
+class Supervisor {
   evaluate(order: IOrder, approves: boolean): void {
     order.status = approves ? "review_quotation" : "cancelled";
     order.log.push(
@@ -41,8 +33,7 @@ export class Supervisor {
   }
 }
 
-// Cotiza, revisa órdenes, cumple el pedido y factura
-export class Seller {
+class Seller {
   prepareQuote(order: IOrder, decides: boolean, quoteValue: number): void {
     if (!decides) {
       order.status = "cancelled";
@@ -54,7 +45,6 @@ export class Seller {
     order.log.push(`🏪 Seller: Cotización preparada → $${quoteValue.toFixed(2)} → Buyer Agent`);
   }
 
-  // Revisa la orden recibida del Buyer Agent
   reviewOrder(order: IOrder, acceptable: boolean): void {
     if (!acceptable) {
       order.status = "actual_quote_review";
@@ -65,7 +55,6 @@ export class Seller {
     order.log.push("🏪 Seller: Orden aceptada ✅ → Cumpliendo pedido");
   }
 
-  // Genera la factura con IVA del 19% sobre la cotización
   prepareInvoice(order: IOrder): void {
     order.invoice = (order.quote ?? 0) * 1.19;
     order.status  = "receive_product";
@@ -73,8 +62,7 @@ export class Seller {
   }
 }
 
-// Recibe el producto final y el pago
-export class ReceiveAgent {
+class ReceiveAgent {
   receiveProduct(order: IOrder): void {
     if (order.status !== "receive_product") return;
     order.log.push("📬 Receive Agent: Producto recibido y pago registrado ✅ COMPLETADO");
