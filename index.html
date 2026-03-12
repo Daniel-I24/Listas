@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Taller de Listas – Gestión de Pedidos</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Outfit:wght@300;400;500;600;700&display=swap');
+
+    /* ── Variables del sistema de diseño ── */
+    :root {
+      --bg:        #0c0e16;
+      --surface:   #13151f;
+      --surface2:  #1a1d2e;
+      --border:    #252840;
+      --accent:    #7c6af7;
+      --accent2:   #00e5b0;
+      --text:      #dde1f0;
+      --muted:     #5a5f7a;
+      --danger:    #f05c5c;
+      --success:   #22d395;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Outfit', sans-serif;
+      min-height: 100vh;
+      padding: 2rem;
+    }
+
+    /* ── Header ── */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 1.5rem;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .header-title h1 {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.3rem;
+      color: var(--accent);
+    }
+    .header-title h1 span { color: var(--accent2); }
+    .header-title p {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+
+    /* ── Chips de actores ── */
+    .actors {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 1.5rem;
+    }
+    .chip {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      border: 1px solid;
+    }
+    .c-shipping   { background:#0f2e1e; color:#4ade80; border-color:#166534; }
+    .c-buyer      { background:#0f1e3a; color:#93c5fd; border-color:#1e3a8a; }
+    .c-supervisor { background:#1e0f3a; color:#c4b5fd; border-color:#5b21b6; }
+    .c-seller     { background:#0f2535; color:#67e8f9; border-color:#0c4a6e; }
+    .c-receiver   { background:#2e1f0f; color:#fdba74; border-color:#92400e; }
+
+    /* ── Formulario ── */
+    .form-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      align-items: flex-end;
+    }
+    .field { display: flex; flex-direction: column; gap: 5px; }
+    label  {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+    }
+    input {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 9px 13px;
+      border-radius: 9px;
+      font-size: 0.9rem;
+      font-family: 'Outfit', sans-serif;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input:focus    { border-color: var(--accent); }
+    input[type="text"]   { width: 230px; }
+    input[type="number"] { width: 110px; }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 9px 22px;
+      border-radius: 9px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+    .btn-primary:hover  { opacity: 0.85; }
+    .btn-primary:active { transform: scale(0.97); }
+
+    /* ── Tabla ── */
+    .table-wrap {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      overflow-x: auto;
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
+    thead tr { background: var(--surface2); }
+    th {
+      padding: 12px 16px;
+      text-align: left;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--border);
+    }
+    td {
+      padding: 11px 16px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr { background: var(--bg); transition: background 0.15s; }
+    tbody tr:hover { background: #10121b; }
+
+    .empty-msg {
+      text-align: center;
+      color: var(--muted);
+      padding: 2.5rem !important;
+      font-size: 0.88rem;
+    }
+
+    /* ── Badges de estado ── */
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 0.73rem;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    .requisition         { background:#0f2e1e; color:#4ade80; }
+    .quote_request       { background:#0f1e3a; color:#93c5fd; }
+    .needs_supervisor    { background:#1e0f3a; color:#c4b5fd; }
+    .quote_evaluation    { background:#1e0f3a; color:#a78bfa; }
+    .review_quotation    { background:#0f2535; color:#67e8f9; }
+    .quote_preparation   { background:#0f2535; color:#38bdf8; }
+    .analyze_quote       { background:#2a2510; color:#fde68a; }
+    .actual_quote_review { background:#0f1e3a; color:#60a5fa; }
+    .order_preparation   { background:#0f1e3a; color:#818cf8; }
+    .order_review        { background:#0f2535; color:#2dd4bf; }
+    .fulfill_order       { background:#0f2e1e; color:#86efac; }
+    .prepare_invoice     { background:#0f2e1e; color:#4ade80; }
+    .receive_product     { background:#0a2e1e; color:#22d395; font-weight:700; }
+    .cancelled           { background:#2e0f0f; color:#f87171; }
+
+    /* ── Botones de acción ── */
+    .actions { display: flex; gap: 6px; flex-wrap: wrap; }
+    .btn-advance {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 5px 13px;
+      border-radius: 7px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .btn-advance:hover { opacity: 0.8; }
+    .btn-log {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      padding: 5px 11px;
+      border-radius: 7px;
+      font-size: 0.78rem;
+      cursor: pointer;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .btn-log:hover { color: var(--text); border-color: var(--muted); }
+    .btn-del {
+      background: transparent;
+      color: var(--danger);
+      border: 1px solid #2e1010;
+      padding: 5px 10px;
+      border-radius: 7px;
+      font-size: 0.78rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-del:hover { background: #2e1010; }
+
+    /* ── Footer ── */
+    footer {
+      margin-top: 1.5rem;
+      text-align: center;
+      font-size: 0.72rem;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-title">
+      <h1>🛒 Taller de <span>LISTAS</span> · Gestión de Pedidos</h1>
+      <p>TypeScript OOP · Diagrama de Procesos · Caso de Estudio</p>
+    </div>
+  </header>
+
+  <!-- Chips que muestran los actores del diagrama -->
+  <div class="actors">
+    <span class="chip c-shipping">📦 Shipping Office</span>
+    <span class="chip c-buyer">🧑 Buyer Agent</span>
+    <span class="chip c-supervisor">👔 Supervisor</span>
+    <span class="chip c-seller">🏪 Seller</span>
+    <span class="chip c-receiver">📬 Receive Agent</span>
+  </div>
+
+  <!-- Formulario: Shipping Office crea la requisición -->
+  <form id="order-form" class="form-card">
+    <div class="field">
+      <label>Producto</label>
+      <input id="product" type="text" placeholder="Ej: Laptop Dell" required />
+    </div>
+    <div class="field">
+      <label>Cantidad</label>
+      <input id="qty" type="number" placeholder="1" min="1" required />
+    </div>
+    <button type="submit" class="btn-primary">+ Crear Pedido</button>
+  </form>
+
+  <!-- Tabla: Lista de pedidos -->
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Producto</th>
+          <th>Cant.</th>
+          <th>Estado</th>
+          <th>Cotización</th>
+          <th>Factura</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="order-body"></tbody>
+    </table>
+  </div>
+
+  <footer>Presiona ▶ Avanzar en cada pedido para seguir el flujo del diagrama</footer>
+
+  <!-- Script compilado de TypeScript -->
+  <script src="dist/bundle.js"></script>
+
+</body>
+</html>

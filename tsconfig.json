@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "target": "ES6",
+    "module": "none",
+    "lib": ["ES2015", "DOM"],
+    "outFile": "./dist/bundle.js",
+    "rootDir": "./src",
+    "strict": false,
+    "removeComments": false
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules"]
+}
